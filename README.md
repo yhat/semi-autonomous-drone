@@ -1,4 +1,5 @@
 # (Semi) Autonomous Drone
+![](http://blog.yhat.com/static/img/drone/raw/raw-view.gif)
 ![](http://blog.yhat.com/static/img/drone/processed/drone-view.gif)
 
 
