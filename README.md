@@ -1,5 +1,8 @@
 # (Semi) Autonomous Drone
-[Full info here]()
+![](http://blog.yhat.com/img/drone/processed/drone-view.gif)
+
+
+[post here]()
 
 ## Go go go
 ```bash
