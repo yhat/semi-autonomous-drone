@@ -1,5 +1,5 @@
 # (Semi) Autonomous Drone
-![](http://blog.yhat.com/img/drone/processed/drone-view.gif)
+![](http://blog.yhat.com/static/img/drone/processed/drone-view.gif)
 
 
 [post here](http://blog.yhat.com/posts/autonomous-droning-with-python.html)
