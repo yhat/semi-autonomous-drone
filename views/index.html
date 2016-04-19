@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="/css/bootstrap.united.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      .camera {
+        position: relative;
+        width : 640px;
+        height: 360px;
+        border: 5px solid #CCC;
+        border-radius: 10px;
+      }
+
+      .pointer {
+        position: absolute;
+        top   : 90px;
+        left  : 90px;
+        width : 20px;
+        height: 20px;
+        background: red;
+        border-radius: 100%;
+      }
+    </style>
+</head>
+
+<body style="padding: 10px;">
+    <div class="row">
+      <div class="col-sm-6">
+        <p class="lead">controls</p>
+        <button class="btn btn-primary" onclick="ignition();">begin</button>
+        <button class="btn btn-warning" onclick="stopAutonomous();">stop</button>
+      </div>
+      <div class="col-sm-6">
+        <p class="lead">stats</p>
+        <table class="table table-bordered">
+          <tr>
+            <td>x</td>
+            <td id="xval"></td>
+          </tr>
+          <tr>
+            <td>y</td>
+            <td id="yval"></td>
+          </tr>
+          <tr>
+            <td>movement</td>
+            <td id="movement"></td>
+          </tr>
+          <tr>
+            <td>total red</td>
+            <td id="total-red"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="camera">
+          <div class="pointer"></div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <img class="current-image-processed"></div>
+      </div>
+    </div>
+    <!-- <img id="current-image"></div> -->
+
+<script type="text/javascript">
+  var xVal = document.querySelector('#xval');
+  var yVal = document.querySelector('#yval');
+  var movement = document.querySelector('#movement');
+  var totalRed = document.querySelector('#total-red');
+
+
+  var pointer = document.querySelector('.pointer');
+  var camera = document.querySelector('.camera');
+  
+  var currentImage = document.querySelector('#current-image');
+
+  var socket = io.connect();
+  socket.on('coords', function (data) {
+
+    console.log(data.time - data.startTime / 1000 );
+
+    if (data.x==null || data.y==null) {
+      movement.textContent = "NOT ENOUGH RED TO JUSTIFY MOVEMENT";
+      pointer.hidden = true;
+      return;
+    }
+    pointer.hidden = false;
+    xval.textContent = "x: " + Math.round(data.x);
+    yval.textContent = "y:" + Math.round(data.y);
+    pointer.style.top  = data.y + "px";
+    pointer.style.left = data.x + "px";
+
+    var x = data.x / data.xmax - 0.5;
+    var txt;
+    if (x > 0) {
+      txt = "drone.right(" + Math.abs(x) + ");"
+    } else {
+      txt = "drone.left(" + Math.abs(x) + ");"
+    }
+    var y = data.y / data.ymax - 0.5;
+    if (y > 0) {
+      txt += "\ndrone.down(" + Math.abs(y) + ");"
+    } else {
+      txt += "\ndrone.up(" + Math.abs(y) + ");"
+    }
+    movement.textContent = txt;
+    totalRed.textContent = data.total_red;
+  });
+
+  /*
+  socket.on('current-image', function() {
+    currentImage.src = '/img/current-image.png?' + Date.now();
+  });
+  */
+
+  socket.on('filename', function(filename) {
+    filename = filename.replace("public", "");
+    camera.style.backgroundImage = "url(" + filename + ")"
+    // var img = document.querySelector('.current-image');
+    // img.src = filename;
+  });
+
+  socket.on('processedFilename', function(filename) {
+    var img = document.querySelector('.current-image-processed');
+    filename = filename.replace("public", "");
+    img.src = filename;
+  });
+
+  function ignition() {
+    socket.emit("ignition");
+  }
+  
+  function stopAutonomous() {
+    socket.emit("stop-autonomous");
+  }
+
+</script>
+
+</body>
